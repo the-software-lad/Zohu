@@ -8,7 +8,7 @@ const RoootGroupLayout = () => {
     if(!isLoaded){
       return null;
     }
-    if(isSignedIn){
+    if(!isSignedIn){
       return <Redirect href="/sign-in" />
     }
   return (
