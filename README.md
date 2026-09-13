@@ -9,10 +9,7 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npm install
    ```
-2. Add a
- ```bash
- .env
-``` file in the project root with:
+2. Add a ```bash .env``` file in the project root with:
 
    ```bash
    EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
