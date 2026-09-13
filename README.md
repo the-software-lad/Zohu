@@ -9,11 +9,16 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    ```bash
    npm install
    ```
-
-2. Start the app
+2. Add a ```.env``` file in the project root with:
 
    ```bash
-   npx expo start
+   EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=
+   ```
+
+3. Start the app
+
+   ```bash
+   npx expo start -c
    ```
 
 In the output, you'll find options to open the app in a
