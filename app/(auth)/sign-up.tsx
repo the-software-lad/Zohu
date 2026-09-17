@@ -5,7 +5,7 @@ import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Controller, useForm } from "react-hook-form";
 import { ActivityIndicator, Image, Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import ImagePath from '../constants/ImagePath';
+import ImagePath from '../../constants/ImagePath';
 
 const SignUpScreen = () => {
 

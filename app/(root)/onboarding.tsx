@@ -10,8 +10,8 @@ import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Image, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ErrorCodes from "../constants/ErrorCodes";
-import ImagePath from "../constants/ImagePath";
+import ErrorCodes from "../../constants/ErrorCodes";
+import ImagePath from "../../constants/ImagePath";
 
 const OnboardingScreen = () => {
 
