@@ -1,6 +1,6 @@
 import { CATEGORY_KEYS_EXPENSE, CATEGORY_KEYS_INCOME, CategoryKey } from "@/constants/Categories";
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite:generateContent";
 
 export type ExtractedTransaction = {
     type: "EXPENSE" | "INCOME" | null;
@@ -87,4 +87,5 @@ export async function extractTransactionFromVoice(base64Audio:string, mimeType: 
     - if any feild can't be confidently determined, set it to null, Do not guess.`;
 
     return callGemini(prompt, {mimeType, data:base64Audio});
+    
 }
