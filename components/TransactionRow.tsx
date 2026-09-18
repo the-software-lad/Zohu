@@ -13,7 +13,6 @@ const TransactionRow = ({ tx, onDelete }:{
     onDelete?:()=> void;
 }) => {
 
-    console.log(tx);
     const config = getCategoryConfig(tx.category);
     const isIncome = tx.type === "INCOME"
 
