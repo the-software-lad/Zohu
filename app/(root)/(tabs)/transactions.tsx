@@ -61,7 +61,7 @@ const TransactionsScreen = () => {
       const {count} = await exportTransactionsToCsv(transactions);
       if(count ===0){
         Alert.alert(
-          "Noting to export",
+          "Nothing to export",
           "No transactions in the export window"
         );
       }
@@ -82,7 +82,7 @@ const TransactionsScreen = () => {
         {text:"Delete" , style: "destructive", onPress: async ()=>{
           const {error : deleteError} = await removeTransaction(tx);
           if(deleteError){
-            Alert.alert("Erro","Couldn't delete this transaction.")
+            Alert.alert("Error","Couldn't delete this transaction.")
           }
         }}
       ]
@@ -135,7 +135,7 @@ const TransactionsScreen = () => {
             className='w-9 h-9 rounded-full bg-white border border-[#E8E6DF] items-center justify-center'
           >
             {
-              exporting ? <ActivityIndicator size="small" color="#5C5F68" /> : <Feather name="download" siE={15} color="#5C5F68" />
+              exporting ? <ActivityIndicator size="small" color="#5C5F68" /> : <Feather name="download" size={15} color="#5C5F68" />
             }
           </TouchableOpacity>
         </View>

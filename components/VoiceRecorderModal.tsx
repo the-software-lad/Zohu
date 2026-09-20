@@ -1,13 +1,19 @@
 import { AI_GRADIENT, COLORS, RECORDING_GRADIENT } from '@/constants/theme';
+import { useSupabase } from '@/hooks/useSupabase';
 import { ExtractedTransaction, extractTransactionFromVoice } from '@/lib/services/extractTransaction';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { RecordingPresets, requestRecordingPermissionsAsync, setAudioModeAsync, useAudioRecorder } from "expo-audio";
 import { BlurView } from 'expo-blur';
 import { File } from 'expo-file-system';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, Platform, Text, TouchableOpacity, View } from 'react-native';
 
 type Status = "idle" | "recording" | "processing" | "error";
+
+const VOICE_RECORDING_OPTIONS = {
+    ...RecordingPresets.HIGH_QUALITY,
+    extension: ".m4a",
+};
 
 const VoiceRecorderModal = ({visible, onClose, onExtracted}:{
     visible: boolean;
@@ -15,7 +21,8 @@ const VoiceRecorderModal = ({visible, onClose, onExtracted}:{
     onExtracted:(result : ExtractedTransaction)=>void;
 }) => {
 
-    const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+    const supabase = useSupabase();
+    const recorder = useAudioRecorder(VOICE_RECORDING_OPTIONS);
     const [status, setStatus] = useState<Status>("idle");
     const [seconds, setSeconds] = useState(0);
 
@@ -54,7 +61,8 @@ const VoiceRecorderModal = ({visible, onClose, onExtracted}:{
 
             const file = new File(uri);
             const base64 = await file.base64();
-            const result = await extractTransactionFromVoice(base64, "audio/m4a");
+            const mimeType = Platform.OS === "web" ? "audio/webm" : "audio/m4a";
+            const result = await extractTransactionFromVoice(supabase, base64, mimeType);
             onExtracted(result);
             onClose();
         }

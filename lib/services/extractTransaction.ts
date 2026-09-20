@@ -1,6 +1,5 @@
-import { CATEGORY_KEYS_EXPENSE, CATEGORY_KEYS_INCOME, CategoryKey } from "@/constants/Categories";
-
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+import { CategoryKey } from "@/constants/Categories";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export type ExtractedTransaction = {
     type: "EXPENSE" | "INCOME" | null;
@@ -11,86 +10,33 @@ export type ExtractedTransaction = {
     transcript: string | null;
 }
 
-const RESPONSE_SCHEMA = {
-    type:"object",
-    properties:{
-        type:{type: "string", enum:["EXPENSE", "INCOME"], nullable: true},
-        amount:{type: "number", nullable:true},
-        category:{
-            type:"string",
-            enum:[...CATEGORY_KEYS_EXPENSE, ...CATEGORY_KEYS_INCOME],
-            nullable: true,
-        },
-        description: {type:"string", nullable:true},
-        date: {type: "string", nullable: true},
-        transcript: {type: "string", nullable: true},
-    },
-    required:["type","amount","category", "description", "date", "transcript"],
-};
+async function callExtractionBackend(
+    supabase: SupabaseClient,
+    kind: "receipt" | "voice",
+    inlineData: {mimeType: string; data: string},
+){
+    const {data, error} = await supabase.functions.invoke<ExtractedTransaction>(
+        "extract-transaction",
+        {body: {kind, ...inlineData}},
+    );
 
-async function callGemini(promptText: string, inlineData:{mimeType: string; data: string}){
-    const apiKey = process.env.EXPO_PUBLIC_GEMINI_KEY;
-    
-    if(!apiKey) throw new Error("Missing EXPO_PUBLIC_GEMINI_KEY");
-    
-    const res = await fetch(GEMINI_URL,
-     {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-         "x-goog-api-key": apiKey,
-       },
-       body:JSON.stringify({
-             contents:[
-                 {
-                     role: "user",
-                     parts:[{text: promptText}, {inlineData}],
-                 },
-             ],
-             generationConfig:{
-                 responseMimeType: "application/json",
-                 responseSchema: RESPONSE_SCHEMA,
-             },
-         }),
-     });
-
-    if(!res.ok){
-        const errText = await res.text();
-        throw new Error(`Gemini request failed: ${errText}`);
-    }
-
-    const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if(!text) throw new Error("No response from Gemini");
-
-    return JSON.parse(text) as ExtractedTransaction;
+    if(error) throw error;
+    if(!data) throw new Error("No extraction response");
+    return data;
 }
 
-export async function  extractTransactionFromReceipt(base64Image: string, mimeType: string): Promise<ExtractedTransaction>{
-    const prompt = `you are reading a receipt photo for a personal finance app. Extract the transaction details
-    - "type" is always "EXPENSE" for a receipt,
-    - "amount" is the final total paid(a plain number, no currency symbols).
-    - "category" must be exactly one of : ${CATEGORY_KEYS_EXPENSE.join(", ")}.
-    - "description" is a short label, ideally the merchant/ store name.
-    - "date" is the receipt date in YYYY-MM-DD format, if visible.
-    - "transcript" should be null.
-    - if any feild can't be confidently determined from the image, set it to null, Do not guess.`;
-
-    return callGemini(prompt, {mimeType, data:base64Image});
+export async function extractTransactionFromReceipt(
+    supabase: SupabaseClient,
+    base64Image: string,
+    mimeType: string,
+): Promise<ExtractedTransaction>{
+    return callExtractionBackend(supabase, "receipt", {mimeType, data:base64Image});
 }
 
-export async function extractTransactionFromVoice(base64Audio:string, mimeType: string): Promise<ExtractedTransaction>{
-    const today = new Date().toISOString().slice(0, 10);
-
-    const prompt = `you are transcibing a short voice note for a for a personal finance app where the user is logging a transaction (e.g. "I spent 400 on grocery yesterday" or "Got 5000 rupees freelance payment today") Extract the transaction details
-    - "type" is "EXPENSE" or "INCOME" based what the user said,
-    - "amount" is the amount mentioned (a plain number, no currency symbols).
-    - "category" must be exactly one of : ${CATEGORY_KEYS_EXPENSE.join(", ")}, ${CATEGORY_KEYS_INCOME.join(", ")} (pick from the income list if type is INCOME, expense list if EXPENSE).
-    - "description" is a short label summarizing what it was for.
-    - "date" should be null unless user clearly mentioned a specific date (e.g. "yesterday", "on Monday") resolve relative dates to YYYY-MM-DD format using ${today} as today's date.
-    - "transcript" is the verbatim transcription of what was said.
-    - if any feild can't be confidently determined, set it to null, Do not guess.`;
-
-    return callGemini(prompt, {mimeType, data:base64Audio});
-    
+export async function extractTransactionFromVoice(
+    supabase: SupabaseClient,
+    base64Audio:string,
+    mimeType: string,
+): Promise<ExtractedTransaction>{
+    return callExtractionBackend(supabase, "voice", {mimeType, data:base64Audio});
 }

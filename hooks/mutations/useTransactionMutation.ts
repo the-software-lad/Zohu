@@ -1,4 +1,4 @@
-import { NewTransaction, Transaction, TransactionType, createTransaction, deleteTransaction } from "@/lib/services/transactions";
+import { NewTransaction, Transaction, createTransaction, deleteTransaction } from "@/lib/services/transactions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSupabase } from "../useSupabase";
 
@@ -9,7 +9,8 @@ export function useDeleteTransaction(){
 
     return useMutation({
         mutationFn: (
-            tx: Pick<Transaction, "id" | "account_id" | "amount" | "type" >,)=>deleteTransaction(supabase, tx.id, tx.account_id, tx.amount, tx.type as TransactionType,),
+            tx: Pick<Transaction, "id">,
+        )=>deleteTransaction(supabase, tx.id),
         onSuccess: (result)=>{
             if(result.error) return;
             queryClient.invalidateQueries({queryKey: ["transactions"]});

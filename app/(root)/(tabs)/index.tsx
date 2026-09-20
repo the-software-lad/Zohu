@@ -117,7 +117,7 @@ const HomeScreen = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
         }
       >
-        <View className='bg-brand-bg rounded-b-[28px] px-5 pt-5 pb[22px]' >
+        <View className='bg-brand-bg rounded-b-[28px] px-5 pt-5 pb-[22px]' >
           <View className='flex-row justify-between items-center mb-[22px]'>
             <Image source={ImagePath.logoLight} style={{width: 80, height:"100%"}} resizeMode="contain"/>
             <View className="flex-row items-center gap-2.5">
@@ -132,7 +132,7 @@ const HomeScreen = () => {
 
               <TouchableOpacity
                 onPress={()=>router.push("/(root)/(tabs)/profile")}
-                className='w-[38px] h-[38px] round-full bg-[#1A1D26] items-center justify-center overflow-hidden'
+                className='w-[38px] h-[38px] rounded-full bg-[#1A1D26] items-center justify-center overflow-hidden'
               >
                 {
                   user?.imageUrl && user.hasImage ?(
@@ -150,7 +150,7 @@ const HomeScreen = () => {
           </View>
           <View className='mb-[22px]'>
             <Text className='text-brand-text-secondary text-xs mb-1.5'>Total balance</Text>
-            <Text className='text-brand-text-primary text-[38px] font-medium tracking-light'>
+            <Text className='text-brand-text-primary text-[38px] font-medium tracking-tight'>
               {formatPrice(totalBalance, currency)}
             </Text>
             <View className='flex-row gap-3.5 mt-2.5'>
@@ -258,7 +258,7 @@ const HomeScreen = () => {
                             {getCategoryConfig(item.category).label}
                           </Text>
                         </View>
-                        <Text className='text-brand-bg- text-[11px] font-medium'>
+                        <Text className='text-brand-bg text-[11px] font-medium'>
                           {formatPrice(item.amount, currency)}
                         </Text>
                       </View>

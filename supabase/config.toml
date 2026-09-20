@@ -1,0 +1,3 @@
+[functions.extract-transaction]
+# Clerk tokens are validated inside the function through an authenticated database RPC.
+verify_jwt = false

@@ -8,6 +8,7 @@ import ErrorCodes from '@/constants/ErrorCodes';
 import { AI_GRADIENT, AI_GRADIENT_REVERSE } from '@/constants/theme';
 import { useCreateTransaction } from '@/hooks/mutations/useTransactionMutation';
 import { useAccountsQuery } from '@/hooks/queries/useAccountQuery';
+import { useSupabase } from '@/hooks/useSupabase';
 import { TransactionFormValues, transactionSchema } from '@/lib/schemas/transaction';
 import { Account } from '@/lib/services/accounts';
 import { ExtractedTransaction, extractTransactionFromReceipt } from '@/lib/services/extractTransaction';
@@ -39,6 +40,7 @@ const TYPE_OPTIONS = [
 const AddTransaction = () => {
   const {user} = useUser();
   const router = useRouter();
+  const supabase = useSupabase();
   const params = useLocalSearchParams<{action?: string}>();
 
 
@@ -148,7 +150,7 @@ const AddTransaction = () => {
     setScannerOpen(false);
     setScanning(true);
     try{
-      const extracted = await extractTransactionFromReceipt(base64, mimeType);
+      const extracted = await extractTransactionFromReceipt(supabase, base64, mimeType);
       applyExtraction(extracted);
       setInputMethod("RECEIPT_SCAN");
     }

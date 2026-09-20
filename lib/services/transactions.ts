@@ -45,25 +45,12 @@ export async function getTransactions(
 export async function deleteTransaction(
     supabase: SupabaseClient,
     transactionId: string,
-    accountId : string,
-    amount: number,
-    type : TransactionType
 ){
-    const {error : deleteError} = await supabase.from("transactions").delete().eq("id", transactionId);
+    const {error} = await supabase.rpc("delete_transaction_with_balance", {
+        p_transaction_id: transactionId,
+    });
 
-    if(deleteError) return {error : deleteError}
-
-    const {data: account, error:fetchError} = await supabase.from("accounts").select("balance").eq("id",accountId).single();
-
-    if(fetchError) return {error : fetchError}
-
-    const delta = type === "INCOME" ? -amount : amount;
-
-    const { error: balanceError } = await supabase.from("accounts").update({balance : account.balance + delta}).eq("id", accountId);
-
-    if(balanceError) return {error: balanceError}
-
-    return {error : null}
+    return {error};
 }
 
 export type NewTransaction = {
@@ -79,19 +66,20 @@ export type NewTransaction = {
 }
 
 export async function createTransaction(supabase: SupabaseClient, payload: NewTransaction){
-    const {data: transaction, error: insertError}= await supabase.from("transactions").insert(payload).select().single();
+    const {data: transaction, error} = await supabase
+        .rpc("create_transaction_with_balance", {
+            p_user_id: payload.user_id,
+            p_account_id: payload.account_id,
+            p_type: payload.type,
+            p_amount: payload.amount,
+            p_category: payload.category,
+            p_description: payload.description ?? null,
+            p_date: payload.date,
+            p_input_method: payload.input_method,
+            p_voice_transcript: payload.voice_transcript,
+        })
+        .single();
 
-    if(insertError) return {transaction: null, error: insertError};
-
-    const {data: account, error: fetchError} = await  supabase.from("accounts").select("balance").eq("id", payload.account_id).single();
-
-    if(fetchError) return {error: fetchError}
-
-    const delta = payload.type === "INCOME" ? payload.amount : -payload.amount;
-
-    const {error: balanceError} = await supabase.from("accounts").update({balance: account.balance + delta}).eq("id", payload.account_id);
-
-    if(balanceError) return{error: balanceError};
-
-    return{transaction: transaction as Transaction, error: null}
+    if(error) return {transaction: null, error};
+    return {transaction: transaction as Transaction, error: null};
 }

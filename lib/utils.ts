@@ -17,7 +17,7 @@ const EXPORT_WINDOW_DAYS = 30;
 const toCsvCell = (value: string | number | null)=>{
     if(value === null) return "";
     const str = String(value);
-    if(/['',\n]/.test(str)) return `"str{str.replace(/"/g,'""')}"`;
+    if(/[",\r\n]/.test(str)) return `"${str.replace(/"/g,'""')}"`;
     return str;
 }
 
