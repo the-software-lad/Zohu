@@ -5,7 +5,7 @@ import { Link, useRouter } from 'expo-router';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Image, Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import ImagePath from '../constants/ImagePath';
+import ImagePath from '../../constants/ImagePath';
 
 const SignIn = () => {
   const {signIn ,errors, fetchStatus} = useSignIn();
