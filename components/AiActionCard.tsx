@@ -32,7 +32,7 @@ const AiActionCard = ({
         translateX.value = withRepeat(
             withTiming(-diag,{duration:3200 , easing: Easing.linear}), -1, false,
         )
-    },[])
+    },[diag, translateX])
   return (
     <TouchableOpacity
         onPress={onPress} 
