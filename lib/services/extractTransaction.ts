@@ -1,6 +1,6 @@
 import { CATEGORY_KEYS_EXPENSE, CATEGORY_KEYS_INCOME, CategoryKey } from "@/constants/Categories";
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite:generateContent";
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
 
 export type ExtractedTransaction = {
     type: "EXPENSE" | "INCOME" | null;
@@ -25,29 +25,34 @@ const RESPONSE_SCHEMA = {
         date: {type: "string", nullable: true},
         transcript: {type: "string", nullable: true},
     },
-    required:["type","amount","categry", "description", "date", "transcript"],
+    required:["type","amount","category", "description", "date", "transcript"],
 };
 
 async function callGemini(promptText: string, inlineData:{mimeType: string; data: string}){
     const apiKey = process.env.EXPO_PUBLIC_GEMINI_KEY;
+    
     if(!apiKey) throw new Error("Missing EXPO_PUBLIC_GEMINI_KEY");
-
-    const res= await fetch(`${GEMINI_URL}?key={apiKey}`, {
-        method:"POST",
-        headers:{"Content-Type": "application/json"},
-        body:JSON.stringify({
-            contents:[
-                {
-                    role: "user",
-                    parts:[{text: promptText}, {inlineData}],
-                },
-            ],
-            generationConfig:{
-                responseMimeType: "application/json",
-                responseSchema: RESPONSE_SCHEMA,
-            },
-        }),
-    });
+    
+    const res = await fetch(GEMINI_URL,
+     {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+         "x-goog-api-key": apiKey,
+       },
+       body:JSON.stringify({
+             contents:[
+                 {
+                     role: "user",
+                     parts:[{text: promptText}, {inlineData}],
+                 },
+             ],
+             generationConfig:{
+                 responseMimeType: "application/json",
+                 responseSchema: RESPONSE_SCHEMA,
+             },
+         }),
+     });
 
     if(!res.ok){
         const errText = await res.text();
