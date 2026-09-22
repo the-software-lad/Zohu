@@ -1,6 +1,6 @@
 import { CATEGORY_KEYS_EXPENSE, CATEGORY_KEYS_INCOME, CategoryKey } from "@/constants/Categories";
+import LLMurl from "@/constants/LLMurl";
 
-const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
 
 export type ExtractedTransaction = {
     type: "EXPENSE" | "INCOME" | null;
@@ -33,7 +33,7 @@ async function callGemini(promptText: string, inlineData:{mimeType: string; data
     
     if(!apiKey) throw new Error("Missing EXPO_PUBLIC_GEMINI_KEY");
     
-    const res = await fetch(GEMINI_URL,
+    const res = await fetch(LLMurl.GEMINI_URL_LITE,
      {
        method: "POST",
        headers: {
